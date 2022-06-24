@@ -79,7 +79,23 @@ def UpdateTick(pi):
 def MoveTick():
     for ip in AllPieces:
         if ip.ismoving:
-            ip.pos[0] += 1
+            for pin in AllPieces:
+                if Direction == "Right":
+                    if ip.pos[0] != 9:
+                        if pin.pos == [ip.pos[0] + 1, ip.pos[1]]:
+                            ip.pos[0] += 1
+                            pin.pos[0] -= 1
+                            return
+                    else:
+                        return
+                elif Direction == "Left":
+                    if ip.pos[0] != 0:
+                        if pin.pos == [ip.pos[0] - 1, ip.pos[1]]:
+                            ip.pos[0] -= 1
+                            pin.pos[0] += 1
+                            return
+                    else:
+                        return
 
 
 Background = pygame.image.load("Assets/Bg.png").convert()
@@ -101,7 +117,7 @@ SetupNodes()
 moving = False
 Direction = None
 
-MoveTimer = -1
+MoveTimer = 0
 TickTimer = 0
 
 while True:
@@ -121,6 +137,10 @@ while True:
             if event.key == pygame.K_a:
                 moving = True
                 Direction = "Left"
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_d or event.key == pygame.K_a:
+                moving = False
+                MoveTimer = 0
 
     if TickTimer == 30:
         for pog in AllPieces:
@@ -129,6 +149,13 @@ while True:
         TickTimer = 0
 
     screen.blit(Background, (0, 0))
+
+    if moving:
+        MoveTimer += 1
+
+    if MoveTimer == 5:
+        MoveTick()
+        MoveTimer = 0
 
     UpdateColorNodes(HoldingPieces)
     UpdateColorNodes(NextPieces)
