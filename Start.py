@@ -17,16 +17,17 @@ clock = pygame.time.Clock()
 
 
 def SetupNodes():
-    for x in range(10):
-        for y in range(20):
+    for y in range(20):
+        for x in range(10):
             AllPieces.append(Piece([x, y], "Empty"))
+    AllPieces.reverse()
 
-    for x in range(4):
-        for y in range(4):
+    for y in range(4):
+        for x in range(4):
             HoldingPieces.append(Piece([x, y], "Empty"))
 
-    for x in range(4):
-        for y in range(4):
+    for y in range(4):
+        for x in range(4):
             NextPieces.append(Piece([x, y], "Empty"))
 
 
@@ -42,9 +43,9 @@ def UpdateColorNodes(NodeList):
             node.surface = OrangeBlock
         if node.state == "Purple":
             node.surface = PurpleBlock
-        if node.state == "RedBlock":
+        if node.state == "Red":
             node.surface = RedBlock
-        if node.state == "YellowBlock":
+        if node.state == "Yellow":
             node.surface = YellowBlock
         if node.state == "Empty":
             node.surface.set_alpha(0)
@@ -57,16 +58,21 @@ def UpdateTick(pi):
                 pint.ismoving = False
         return
 
-    NewPos = None
+    NewPos = Piece([pi.pos[0], pi.pos[1] + 1], "Empty")
     for pin in AllPieces:
         if pin.pos == [pi.pos[0], pi.pos[1] + 1]:
             NewPos = pin
 
     if NewPos.state == "Empty":
-        NewPos.pos[1] -= 1
+        for pin in AllPieces:
+            if pin.pos == [pi.pos[0], pi.pos[1] + 1]:
+                pin.pos[1] -= 1
         pi.pos[1] += 1
         return
     elif NewPos.ismoving:
+        for pin in AllPieces:
+            if pin.pos == [pi.pos[0], pi.pos[1] + 1]:
+                pin.pos[1] -= 1
         pi.pos[1] += 1
         return
     else:
@@ -75,27 +81,47 @@ def UpdateTick(pi):
                 pint.ismoving = False
 
 
+def MoveCheck(allmoving):
+    edge = False
+    blocked = False
 
-def MoveTick():
-    for ip in AllPieces:
-        if ip.ismoving:
-            for pin in AllPieces:
-                if Direction == "Right":
-                    if ip.pos[0] != 9:
-                        if pin.pos == [ip.pos[0] + 1, ip.pos[1]]:
-                            ip.pos[0] += 1
-                            pin.pos[0] -= 1
-                            return
-                    else:
-                        return
-                elif Direction == "Left":
-                    if ip.pos[0] != 0:
-                        if pin.pos == [ip.pos[0] - 1, ip.pos[1]]:
-                            ip.pos[0] -= 1
-                            pin.pos[0] += 1
-                            return
-                    else:
-                        return
+    for thing in allmoving:
+        if Direction == "Right":
+            if thing.pos[0] == 9:
+                edge = True
+        if Direction == "Left":
+            if thing.pos[0] == 0:
+                edge = True
+
+    if not edge:
+        if Direction == "Right":
+            for place in allmoving:
+                place.pos[0] += 1
+        if Direction == "Left":
+            for place in allmoving:
+                place.pos[0] -= 1
+
+        for place in allmoving:
+            for square in AllPieces:
+                if square.pos == place.pos:
+                    if square.state != "Empty":
+                        blocked = True
+    else:
+        blocked = True
+
+    if not blocked:
+        return True
+    if blocked:
+        return False
+
+
+def PieceCords(name):
+    if name == "Square":
+        squarepos = [[4, 0],
+                     [5, 0],
+                     [4, 1],
+                     [5, 1]]
+        return squarepos
 
 
 Background = pygame.image.load("Assets/Bg.png").convert()
@@ -112,6 +138,8 @@ AllPieces = []
 HoldingPieces = []
 NextPieces = []
 
+MovingPieces = []
+
 SetupNodes()
 
 moving = False
@@ -127,10 +155,18 @@ while True:
             exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
-                for place in AllPieces:
-                    if place.pos == [0, 0]:
-                        place.state = "Blue"
-                        place.ismoving = True
+                Unspawnable = False
+                for cords in PieceCords("Square"):
+                    for p in AllPieces:
+                        if cords == p.pos:
+                            if p.state != "Empty":
+                                Unspawnable = True
+                if not Unspawnable:
+                    for cords in PieceCords("Square"):
+                        for p in AllPieces:
+                            if p.pos == cords:
+                                p.state = "Yellow"
+                                p.ismoving = True
             if event.key == pygame.K_d:
                 moving = True
                 Direction = "Right"
@@ -142,6 +178,30 @@ while True:
                 moving = False
                 MoveTimer = 0
 
+    if moving:
+        MoveTimer += 1
+
+    if MoveTimer == 5:
+        for movingB in AllPieces:
+            if movingB.ismoving:
+                MovingPieces.append(movingB)
+        if MoveCheck(MovingPieces):
+            for movingB in AllPieces:
+                if movingB.ismoving:
+                    if Direction == "Right":
+                        for p in AllPieces:
+                            if p.pos[0] == movingB.pos[0] + 1:
+                                p.pos[0] = movingB.pos[0]
+                        movingB.pos[0] += 1
+                    if Direction == "Left":
+                        for p in AllPieces:
+                            if p.pos[0] == movingB.pos[0] - 1:
+                                p.pos[0] = movingB.pos[0]
+                        movingB.pos[0] -= 1
+        MovingPieces = []
+        MoveTimer = 0
+        Blocked = False
+
     if TickTimer == 30:
         for pog in AllPieces:
             if pog.ismoving:
@@ -149,13 +209,6 @@ while True:
         TickTimer = 0
 
     screen.blit(Background, (0, 0))
-
-    if moving:
-        MoveTimer += 1
-
-    if MoveTimer == 5:
-        MoveTick()
-        MoveTimer = 0
 
     UpdateColorNodes(HoldingPieces)
     UpdateColorNodes(NextPieces)
