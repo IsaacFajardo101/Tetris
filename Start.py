@@ -273,6 +273,16 @@ while True:
         MovingPieces = []
         TickTimer = 0
 
+    NumSolid = 0
+    for line in range(19):
+        for thing in AllPieces:
+            if thing[1] == line:
+                if thing.state != "Empty":
+                    if not thing.ismoving:
+                        NumSolid += 1
+        if NumSolid == 10:
+            for thing in AllPieces:
+                
     screen.blit(Background, (0, 0))
 
     UpdateColorNodes(HoldingPieces, "Hold")
