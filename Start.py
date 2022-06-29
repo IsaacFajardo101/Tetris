@@ -88,34 +88,33 @@ def UpdateColorNodes(NodeList, Where):
                 screen.blit(EmptyBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
 
 
-def UpdateTick(pi):
-    if pi.pos[1] == 19:
-        for pint in AllPieces:
-            if pint.ismoving:
-                pint.ismoving = False
-        return
+def UpdateTick(allmoving):
+    edge = False
+    blocked = False
 
-    NewPos = Piece([pi.pos[0], pi.pos[1] + 1], "Empty")
-    for pin in AllPieces:
-        if pin.pos == [pi.pos[0], pi.pos[1] + 1]:
-            NewPos = pin
+    themoving = copy.deepcopy(allmoving)
 
-    if NewPos.state == "Empty":
-        for pin in AllPieces:
-            if pin.pos == [pi.pos[0], pi.pos[1] + 1]:
-                pin.pos[1] -= 1
-        pi.pos[1] += 1
-        return
-    elif NewPos.ismoving:
-        for pin in AllPieces:
-            if pin.pos == [pi.pos[0], pi.pos[1] + 1]:
-                pin.pos[1] -= 1
-        pi.pos[1] += 1
-        return
-    else:
-        for pint in AllPieces:
-            if pint.ismoving:
-                pint.ismoving = False
+    for thing in themoving:
+        if thing.pos[1] == 19:
+            edge = True
+
+    for place in themoving:
+        place.pos[1] += 1
+
+    for place in themoving:
+        for square in AllPieces:
+            if square.pos == place.pos:
+                if not square.ismoving:
+                    if square.state != "Empty":
+                        blocked = True
+
+    if edge:
+        blocked = True
+
+    if not blocked:
+        return True
+    if blocked:
+        return False
 
 
 def MoveCheck(allmoving):
@@ -252,9 +251,26 @@ while True:
         Blocked = False
 
     if TickTimer == 30:
-        for pog in AllPieces:
-            if pog.ismoving:
-                UpdateTick(pog)
+        for movingB in AllPieces:
+            if movingB.ismoving:
+                MovingPieces.append(movingB)
+        MovingPieces = copy.deepcopy(MovingPieces)
+        if UpdateTick(MovingPieces):
+            for movingB in AllPieces:
+                if movingB.ismoving:
+                    movingB.state = "Empty"
+                    movingB.ismoving = False
+            for movingB in AllPieces:
+                for mover in MovingPieces:
+                    if movingB.pos[0] == mover.pos[0]:
+                        if movingB.pos[1] == mover.pos[1] + 1:
+                            movingB.state = mover.state
+                            movingB.ismoving = True
+        else:
+            for movingB in AllPieces:
+                if movingB.ismoving:
+                    movingB.ismoving = False
+        MovingPieces = []
         TickTimer = 0
 
     screen.blit(Background, (0, 0))
