@@ -1,4 +1,5 @@
 import pygame
+import copy
 from sys import exit
 
 
@@ -7,7 +8,6 @@ class Piece:
         self.pos = pos
         self.state = state
         self.ismoving = False
-        self.surface = pygame.Surface((25, 25))
 
 
 pygame.init()
@@ -31,24 +31,61 @@ def SetupNodes():
             NextPieces.append(Piece([x, y], "Empty"))
 
 
-def UpdateColorNodes(NodeList):
-    for node in NodeList:
-        if node.state == "Blue":
-            node.surface = BlueBlock
-        if node.state == "Green":
-            node.surface = GreenBlock
-        if node.state == "LightBlue":
-            node.surface = LightBlueBlock
-        if node.state == "Orange":
-            node.surface = OrangeBlock
-        if node.state == "Purple":
-            node.surface = PurpleBlock
-        if node.state == "Red":
-            node.surface = RedBlock
-        if node.state == "Yellow":
-            node.surface = YellowBlock
-        if node.state == "Empty":
-            node.surface.set_alpha(0)
+def UpdateColorNodes(NodeList, Where):
+    if Where == "All":
+        for node in NodeList:
+            if node.state == "Blue":
+                screen.blit(BlueBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
+            if node.state == "Green":
+                screen.blit(GreenBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
+            if node.state == "LightBlue":
+                screen.blit(LightBlueBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
+            if node.state == "Orange":
+                screen.blit(OrangeBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
+            if node.state == "Purple":
+                screen.blit(PurpleBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
+            if node.state == "Red":
+                screen.blit(RedBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
+            if node.state == "Yellow":
+                screen.blit(YellowBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
+            if node.state == "Empty":
+                screen.blit(EmptyBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
+    if Where == "Hold":
+        for node in NodeList:
+            if node.state == "Blue":
+                screen.blit(BlueBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
+            if node.state == "Green":
+                screen.blit(GreenBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
+            if node.state == "LightBlue":
+                screen.blit(LightBlueBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
+            if node.state == "Orange":
+                screen.blit(OrangeBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
+            if node.state == "Purple":
+                screen.blit(PurpleBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
+            if node.state == "Red":
+                screen.blit(RedBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
+            if node.state == "Yellow":
+                screen.blit(YellowBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
+            if node.state == "Empty":
+                screen.blit(EmptyBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
+    if Where == "Next":
+        for node in NodeList:
+            if node.state == "Blue":
+                screen.blit(BlueBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
+            if node.state == "Green":
+                screen.blit(GreenBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
+            if node.state == "LightBlue":
+                screen.blit(LightBlueBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
+            if node.state == "Orange":
+                screen.blit(OrangeBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
+            if node.state == "Purple":
+                screen.blit(PurpleBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
+            if node.state == "Red":
+                screen.blit(RedBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
+            if node.state == "Yellow":
+                screen.blit(YellowBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
+            if node.state == "Empty":
+                screen.blit(EmptyBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
 
 
 def UpdateTick(pi):
@@ -85,7 +122,9 @@ def MoveCheck(allmoving):
     edge = False
     blocked = False
 
-    for thing in allmoving:
+    themoving = copy.deepcopy(allmoving)
+
+    for thing in themoving:
         if Direction == "Right":
             if thing.pos[0] == 9:
                 edge = True
@@ -95,17 +134,18 @@ def MoveCheck(allmoving):
 
     if not edge:
         if Direction == "Right":
-            for place in allmoving:
+            for place in themoving:
                 place.pos[0] += 1
         if Direction == "Left":
-            for place in allmoving:
+            for place in themoving:
                 place.pos[0] -= 1
 
-        for place in allmoving:
+        for place in themoving:
             for square in AllPieces:
                 if square.pos == place.pos:
-                    if square.state != "Empty":
-                        blocked = True
+                    if not square.ismoving:
+                        if square.state != "Empty":
+                            blocked = True
     else:
         blocked = True
 
@@ -118,8 +158,8 @@ def MoveCheck(allmoving):
 def PieceCords(name):
     if name == "Square":
         squarepos = [[4, 0],
-                     [5, 0],
                      [4, 1],
+                     [5, 0],
                      [5, 1]]
         return squarepos
 
@@ -132,6 +172,8 @@ OrangeBlock = pygame.image.load("Assets/OrangeBlock.png").convert()
 PurpleBlock = pygame.image.load("Assets/PurpleBlock.png").convert()
 RedBlock = pygame.image.load("Assets/RedBlock.png").convert()
 YellowBlock = pygame.image.load("Assets/YellowBlock.png").convert()
+EmptyBlock = pygame.Surface((25, 25))
+EmptyBlock.set_alpha(0)
 
 
 AllPieces = []
@@ -185,19 +227,26 @@ while True:
         for movingB in AllPieces:
             if movingB.ismoving:
                 MovingPieces.append(movingB)
+        MovingPieces = copy.deepcopy(MovingPieces)
+
         if MoveCheck(MovingPieces):
             for movingB in AllPieces:
                 if movingB.ismoving:
-                    if Direction == "Right":
-                        for p in AllPieces:
-                            if p.pos[0] == movingB.pos[0] + 1:
-                                p.pos[0] = movingB.pos[0]
-                        movingB.pos[0] += 1
-                    if Direction == "Left":
-                        for p in AllPieces:
-                            if p.pos[0] == movingB.pos[0] - 1:
-                                p.pos[0] = movingB.pos[0]
-                        movingB.pos[0] -= 1
+                    movingB.state = "Empty"
+                    movingB.ismoving = False
+            for movingB in AllPieces:
+                if Direction == "Right":
+                    for mover in MovingPieces:
+                        if movingB.pos[1] == mover.pos[1]:
+                            if movingB.pos[0] == mover.pos[0] + 1:
+                                movingB.state = mover.state
+                                movingB.ismoving = True
+                if Direction == "Left":
+                    for mover in MovingPieces:
+                        if movingB.pos[1] == mover.pos[1]:
+                            if movingB.pos[0] == mover.pos[0] - 1:
+                                movingB.state = mover.state
+                                movingB.ismoving = True
         MovingPieces = []
         MoveTimer = 0
         Blocked = False
@@ -210,16 +259,9 @@ while True:
 
     screen.blit(Background, (0, 0))
 
-    UpdateColorNodes(HoldingPieces)
-    UpdateColorNodes(NextPieces)
-    UpdateColorNodes(AllPieces)
-
-    for p in AllPieces:
-        screen.blit(p.surface, (125 + (p.pos[0] * 25), 0 + (p.pos[1] * 25)))
-    for p in HoldingPieces:
-        screen.blit(p.surface, (12 + (p.pos[0] * 25), 12 + (p.pos[1] * 25)))
-    for p in NextPieces:
-        screen.blit(p.surface, (389 + (p.pos[0] * 25), 11 + (p.pos[1] * 25)))
+    UpdateColorNodes(HoldingPieces, "Hold")
+    UpdateColorNodes(NextPieces, "Next")
+    UpdateColorNodes(AllPieces, "All")
 
     pygame.display.update()
     TickTimer += 1
