@@ -155,6 +155,58 @@ def MoveCheck(allmoving):
         return False
 
 
+def RotateCheck(allmoving):
+    edge = False
+    blocked = False
+
+    themoving = copy.deepcopy(allmoving)
+
+    if themoving[0].state == "Orange":
+        if RotationState == 0:
+            themoving[0].pos[0] += 1
+            themoving[0].pos[1] -= 1
+
+            themoving[3].pos[0] += 1
+            themoving[3].pos[1] += 1
+        if RotationState == 1:
+            themoving[0].pos[0] += 1
+
+            themoving[1].pos[0] -= 1
+            themoving[1].pos[1] += 2
+        if RotationState == 2:
+            themoving[3].pos[1] += 1
+
+            themoving[0].pos[0] -= 2
+            themoving[0].pos[1] -= 1
+        if RotationState == 3:
+            themoving[2].pos[0] += 1
+            themoving[2].pos[1] -= 1
+
+            themoving[3].pos[0] -= 1
+            themoving[3].pos[1] -= 1
+
+    for stiff in themoving:
+        if stiff.pos[0] < 0 or stiff.pos[0] > 9:
+            edge = True
+        if stiff.pos[1] < 0 or stiff.pos[1] > 19:
+            edge = True
+
+    if edge:
+        blocked = True
+    else:
+        for place in themoving:
+            for square in AllPieces:
+                if square.pos == place.pos:
+                    if not square.ismoving:
+                        if square.state != "Empty":
+                            blocked = True
+
+    if not blocked:
+        return True
+    if blocked:
+        return False
+
+
 def PieceCords(name):
     if name == "Square":
         squarepos = [[4, 0],
@@ -222,10 +274,13 @@ SetupNodes()
 
 moving = False
 Direction = None
+Rotating = False
 
 MoveTimer = 0
 TickTimer = 0
 speed = 30
+
+RotationState = 0
 
 while True:
     for event in pygame.event.get():
@@ -241,6 +296,8 @@ while True:
                 Direction = "Left"
             if event.key == pygame.K_s:
                 speed = 5
+            if event.key == pygame.K_SPACE:
+                Rotating = True
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_d:
                 if Direction == "Right":
@@ -252,6 +309,56 @@ while True:
                     MoveTimer = 0
             if event.key == pygame.K_s:
                 speed = 30
+
+    if Rotating:
+        ColorPiece = None
+        for movingB in AllPieces:
+            if movingB.ismoving:
+                MovingPieces.append(movingB)
+        MovingPieces = copy.deepcopy(MovingPieces)
+
+        if RotateCheck(MovingPieces):
+            for movingB in AllPieces:
+                if movingB.ismoving:
+                    movingB.state = "Empty"
+                    movingB.ismoving = False
+            for moveplace in MovingPieces:
+                ColorPiece = moveplace.state
+            if ColorPiece == "Orange":
+                if RotationState == 0:
+                    MovingPieces[0].pos[0] += 1
+                    MovingPieces[0].pos[1] -= 1
+
+                    MovingPieces[3].pos[0] += 1
+                    MovingPieces[3].pos[1] += 1
+                if RotationState == 1:
+                    MovingPieces[0].pos[0] += 1
+
+                    MovingPieces[1].pos[0] -= 1
+                    MovingPieces[1].pos[1] += 2
+                if RotationState == 2:
+                    MovingPieces[3].pos[1] += 1
+
+                    MovingPieces[0].pos[0] -= 2
+                    MovingPieces[0].pos[1] -= 1
+                if RotationState == 3:
+                    MovingPieces[2].pos[0] += 1
+                    MovingPieces[2].pos[1] -= 1
+
+                    MovingPieces[3].pos[0] -= 1
+                    MovingPieces[3].pos[1] -= 1
+            for place in AllPieces:
+                for position in MovingPieces:
+                    if position.pos == place.pos:
+                        place.state = position.state
+                        place.ismoving = True
+            if RotationState != 3:
+                RotationState += 1
+            else:
+                RotationState = 0
+        MovingPieces = []
+        Rotating = False
+        Blocked = False
 
     if moving:
         MoveTimer += 1
@@ -337,6 +444,7 @@ while True:
             WeSpawn = False
 
     if WeSpawn:
+        RotationState = 0
         num = random.randint(1, 7)
         spawncords = []
         dacolor = ""
