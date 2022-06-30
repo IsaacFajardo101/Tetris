@@ -188,6 +188,7 @@ Direction = None
 
 MoveTimer = 0
 TickTimer = 0
+speed = 30
 
 while True:
     for event in pygame.event.get():
@@ -214,10 +215,19 @@ while True:
             if event.key == pygame.K_a:
                 moving = True
                 Direction = "Left"
+            if event.key == pygame.K_s:
+                speed = 5
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_d or event.key == pygame.K_a:
-                moving = False
-                MoveTimer = 0
+            if event.key == pygame.K_d:
+                if Direction == "Right":
+                    moving = False
+                    MoveTimer = 0
+            if event.key == pygame.K_a:
+                if Direction == "Left":
+                    moving = False
+                    MoveTimer = 0
+            if event.key == pygame.K_s:
+                speed = 30
 
     if moving:
         MoveTimer += 1
@@ -250,7 +260,7 @@ while True:
         MoveTimer = 0
         Blocked = False
 
-    if TickTimer == 30:
+    if TickTimer >= speed:
         for movingB in AllPieces:
             if movingB.ismoving:
                 MovingPieces.append(movingB)
@@ -273,16 +283,29 @@ while True:
         MovingPieces = []
         TickTimer = 0
 
-    NumSolid = 0
     for line in range(19):
+        NumSolid = 0
         for thing in AllPieces:
-            if thing[1] == line:
+            if thing.pos[1] == line:
                 if thing.state != "Empty":
                     if not thing.ismoving:
                         NumSolid += 1
         if NumSolid == 10:
             for thing in AllPieces:
-                
+                if thing.pos[1] == line:
+                    thing.state = "Empty"
+            for thing in AllPieces:
+                if thing.pos[1] < line:
+                    MovingPieces.append(copy.deepcopy(thing))
+            for thing in AllPieces:
+                if thing.pos[1] < line:
+                    thing.state = "Empty"
+            for thing in MovingPieces:
+                thing.pos[1] += 1
+                for stuff in AllPieces:
+                    if thing.pos == stuff.pos:
+                        stuff.state = thing.state
+        MovingPieces = []
     screen.blit(Background, (0, 0))
 
     UpdateColorNodes(HoldingPieces, "Hold")
