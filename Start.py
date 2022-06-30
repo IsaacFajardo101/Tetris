@@ -1,5 +1,6 @@
 import pygame
 import copy
+import random
 from sys import exit
 
 
@@ -161,6 +162,42 @@ def PieceCords(name):
                      [5, 0],
                      [5, 1]]
         return squarepos
+    if name == "L":
+        lpos = [[4, 0],
+                [4, 1],
+                [4, 2],
+                [5, 2]]
+        return lpos
+    if name == "LR":
+        lrpos = [[5, 0],
+                 [5, 1],
+                 [5, 2],
+                 [4, 2]]
+        return lrpos
+    if name == "Line":
+        linepos = [[5, 0],
+                   [5, 1],
+                   [5, 2],
+                   [5, 3]]
+        return linepos
+    if name == "T":
+        tpos = [[5, 0],
+                [5, 1],
+                [4, 1],
+                [6, 1]]
+        return tpos
+    if name == "Z":
+        zpos = [[5, 0],
+                [5, 1],
+                [4, 1],
+                [4, 2]]
+        return zpos
+    if name == "ZR":
+        zrpos = [[4, 0],
+                 [4, 1],
+                 [5, 1],
+                 [5, 2]]
+        return zrpos
 
 
 Background = pygame.image.load("Assets/Bg.png").convert()
@@ -196,19 +233,6 @@ while True:
             pygame.quit()
             exit()
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RETURN:
-                Unspawnable = False
-                for cords in PieceCords("Square"):
-                    for p in AllPieces:
-                        if cords == p.pos:
-                            if p.state != "Empty":
-                                Unspawnable = True
-                if not Unspawnable:
-                    for cords in PieceCords("Square"):
-                        for p in AllPieces:
-                            if p.pos == cords:
-                                p.state = "Yellow"
-                                p.ismoving = True
             if event.key == pygame.K_d:
                 moving = True
                 Direction = "Right"
@@ -306,6 +330,44 @@ while True:
                     if thing.pos == stuff.pos:
                         stuff.state = thing.state
         MovingPieces = []
+
+    WeSpawn = True
+    for thing in AllPieces:
+        if thing.ismoving:
+            WeSpawn = False
+
+    if WeSpawn:
+        num = random.randint(1, 7)
+        spawncords = []
+        dacolor = ""
+        if num == 1:
+            spawncords = PieceCords("Square")
+            dacolor = "Yellow"
+        elif num == 2:
+            spawncords = PieceCords("L")
+            dacolor = "Orange"
+        elif num == 3:
+            spawncords = PieceCords("LR")
+            dacolor = "Blue"
+        elif num == 4:
+            spawncords = PieceCords("Line")
+            dacolor = "LightBlue"
+        elif num == 5:
+            spawncords = PieceCords("T")
+            dacolor = "Purple"
+        elif num == 6:
+            spawncords = PieceCords("Z")
+            dacolor = "Red"
+        elif num == 7:
+            spawncords = PieceCords("ZR")
+            dacolor = "Green"
+
+        for cords in spawncords:
+            for thing in AllPieces:
+                if cords == thing.pos:
+                    thing.state = dacolor
+                    thing.ismoving = True
+
     screen.blit(Background, (0, 0))
 
     UpdateColorNodes(HoldingPieces, "Hold")
