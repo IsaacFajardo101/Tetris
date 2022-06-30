@@ -283,7 +283,7 @@ while True:
         MovingPieces = []
         TickTimer = 0
 
-    for line in range(19):
+    for line in range(20):
         NumSolid = 0
         for thing in AllPieces:
             if thing.pos[1] == line:
