@@ -410,8 +410,12 @@ speed = 30
 
 RotationState = 0
 NextSpawn = 0
+HoldSpawn = 0
+num = 0
 spawncords = []
 dacolor = ""
+
+Lost = False
 
 while True:
     for event in pygame.event.get():
@@ -429,6 +433,8 @@ while True:
                 speed = 5
             if event.key == pygame.K_SPACE:
                 Rotating = True
+            if event.key == pygame.K_LSHIFT:
+                HoldSpawn = num
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_d:
                 if Direction == "Right":
@@ -660,6 +666,7 @@ while True:
             for movingB in AllPieces:
                 if movingB.ismoving:
                     movingB.ismoving = False
+            speed = 30
         MovingPieces = []
         TickTimer = 0
 
@@ -754,6 +761,50 @@ while True:
         for cords in spawncords:
             if cords == thing.pos:
                 thing.state = dacolor
+
+    spawncords = []
+    dacolor = "Empty"
+
+    if HoldSpawn == 1:
+        spawncords = PieceCords("Square", "Side")
+        dacolor = "Yellow"
+    elif HoldSpawn == 2:
+        spawncords = PieceCords("L", "Side")
+        dacolor = "Orange"
+    elif HoldSpawn == 3:
+        spawncords = PieceCords("LR", "Side")
+        dacolor = "Blue"
+    elif HoldSpawn == 4:
+        spawncords = PieceCords("Line", "Side")
+        dacolor = "LightBlue"
+    elif HoldSpawn == 5:
+        spawncords = PieceCords("T", "Side")
+        dacolor = "Purple"
+    elif HoldSpawn == 6:
+        spawncords = PieceCords("Z", "Side")
+        dacolor = "Red"
+    elif HoldSpawn == 7:
+        spawncords = PieceCords("ZR", "Side")
+        dacolor = "Green"
+
+    for thing in HoldingPieces:
+        thing.state = "Empty"
+        for cords in spawncords:
+            if cords == thing.pos:
+                thing.state = dacolor
+
+    for thing in AllPieces:
+        if thing.pos[1] == 3:
+            if not thing.ismoving:
+                if thing.state != "Empty":
+                    Lost = True
+
+    if Lost:
+        for thing in AllPieces:
+            thing.state = "Empty"
+            thing.ismoving = False
+        HoldSpawn = 0
+        Lost = False
 
     screen.blit(Background, (0, 0))
 
