@@ -26,10 +26,12 @@ def SetupNodes():
     for y in range(4):
         for x in range(4):
             HoldingPieces.append(Piece([x, y], "Empty"))
+    HoldingPieces.reverse()
 
     for y in range(4):
         for x in range(4):
             NextPieces.append(Piece([x, y], "Empty"))
+    NextPieces.reverse()
 
 
 def UpdateColorNodes(NodeList, Where):
@@ -185,6 +187,129 @@ def RotateCheck(allmoving):
             themoving[3].pos[0] -= 1
             themoving[3].pos[1] -= 1
 
+    if themoving[0].state == "LightBlue":
+        if RotationState == 0:
+            themoving[0].pos[0] += 1
+            themoving[0].pos[1] -= 1
+
+            themoving[2].pos[0] -= 1
+            themoving[2].pos[1] += 1
+
+            themoving[3].pos[0] -= 2
+            themoving[3].pos[1] += 2
+        if RotationState == 1:
+            themoving[0].pos[0] -= 2
+            themoving[0].pos[1] += 1
+
+            themoving[1].pos[0] -= 1
+            themoving[1].pos[1] -= 1
+
+            themoving[3].pos[0] += 1
+            themoving[3].pos[1] -= 2
+        if RotationState == 2:
+            themoving[0].pos[0] -= 1
+            themoving[0].pos[1] -= 2
+
+            themoving[1].pos[0] += 1
+            themoving[1].pos[1] -= 1
+
+            themoving[3].pos[0] += 2
+            themoving[3].pos[1] += 1
+        if RotationState == 3:
+            themoving[0].pos[0] -= 1
+            themoving[0].pos[1] += 2
+
+            themoving[2].pos[0] += 1
+            themoving[2].pos[1] += 1
+
+            themoving[3].pos[0] += 2
+            themoving[3].pos[1] -= 1
+
+    if themoving[0].state == "Blue":
+        if RotationState == 0:
+            themoving[2].pos[0] += 1
+            themoving[2].pos[1] += 1
+
+            themoving[3].pos[0] += 1
+            themoving[3].pos[1] -= 1
+        if RotationState == 1:
+            themoving[0].pos[0] -= 1
+            themoving[0].pos[1] -= 1
+
+            themoving[1].pos[0] -= 1
+            themoving[1].pos[1] += 1
+        if RotationState == 2:
+            themoving[0].pos[0] += 1
+            themoving[0].pos[1] -= 1
+
+            themoving[1].pos[0] -= 1
+            themoving[1].pos[1] -= 1
+        if RotationState == 3:
+            themoving[2].pos[0] += 1
+            themoving[2].pos[1] -= 1
+
+            themoving[3].pos[0] += 1
+            themoving[3].pos[1] += 1
+
+    if themoving[0].state == "Purple":
+        if RotationState == 0:
+            themoving[3].pos[0] -= 1
+
+            themoving[0].pos[0] -= 2
+            themoving[0].pos[1] += 1
+        if RotationState == 1:
+            themoving[2].pos[0] += 1
+            themoving[2].pos[1] -= 1
+
+            themoving[0].pos[0] += 2
+            themoving[0].pos[1] -= 2
+        if RotationState == 2:
+            themoving[0].pos[0] += 1
+
+            themoving[3].pos[0] += 2
+            themoving[3].pos[1] -= 1
+        if RotationState == 3:
+            themoving[2].pos[1] += 1
+
+            themoving[3].pos[0] += 1
+            themoving[3].pos[1] += 2
+
+    if themoving[0].state == "Red":
+        if RotationState == 0:
+            themoving[0].pos[0] += 2
+
+            themoving[3].pos[1] += 2
+        if RotationState == 1:
+            themoving[3].pos[0] += 2
+
+            themoving[2].pos[1] += 2
+        if RotationState == 2:
+            themoving[2].pos[0] += 2
+
+            themoving[0].pos[1] -= 2
+        if RotationState == 3:
+            themoving[3].pos[0] += 2
+
+            themoving[0].pos[1] -= 2
+
+    if themoving[0].state == "Green":
+        if RotationState == 0:
+            themoving[2].pos[0] += 2
+
+            themoving[3].pos[1] += 2
+        if RotationState == 1:
+            themoving[2].pos[0] -= 2
+
+            themoving[3].pos[1] += 2
+        if RotationState == 2:
+            themoving[1].pos[0] -= 2
+
+            themoving[0].pos[1] -= 2
+        if RotationState == 3:
+            themoving[1].pos[0] += 2
+
+            themoving[0].pos[1] -= 2
+
     for stiff in themoving:
         if stiff.pos[0] < 0 or stiff.pos[0] > 9:
             edge = True
@@ -281,6 +406,9 @@ TickTimer = 0
 speed = 30
 
 RotationState = 0
+NextSpawn = 0
+spawncords = []
+dacolor = ""
 
 while True:
     for event in pygame.event.get():
@@ -347,6 +475,124 @@ while True:
 
                     MovingPieces[3].pos[0] -= 1
                     MovingPieces[3].pos[1] -= 1
+            if ColorPiece == "LightBlue":
+                if RotationState == 0:
+                    MovingPieces[0].pos[0] += 1
+                    MovingPieces[0].pos[1] -= 1
+
+                    MovingPieces[2].pos[0] -= 1
+                    MovingPieces[2].pos[1] += 1
+
+                    MovingPieces[3].pos[0] -= 2
+                    MovingPieces[3].pos[1] += 2
+                if RotationState == 1:
+                    MovingPieces[0].pos[0] -= 2
+                    MovingPieces[0].pos[1] += 1
+
+                    MovingPieces[1].pos[0] -= 1
+                    MovingPieces[1].pos[1] -= 1
+
+                    MovingPieces[3].pos[0] += 1
+                    MovingPieces[3].pos[1] -= 2
+                if RotationState == 2:
+                    MovingPieces[0].pos[0] -= 1
+                    MovingPieces[0].pos[1] -= 2
+
+                    MovingPieces[1].pos[0] += 1
+                    MovingPieces[1].pos[1] -= 1
+
+                    MovingPieces[3].pos[0] += 2
+                    MovingPieces[3].pos[1] += 1
+                if RotationState == 3:
+                    MovingPieces[0].pos[0] -= 1
+                    MovingPieces[0].pos[1] += 2
+
+                    MovingPieces[2].pos[0] += 1
+                    MovingPieces[2].pos[1] += 1
+
+                    MovingPieces[3].pos[0] += 2
+                    MovingPieces[3].pos[1] -= 1
+            if ColorPiece == "Blue":
+                if RotationState == 0:
+                    MovingPieces[2].pos[0] += 1
+                    MovingPieces[2].pos[1] += 1
+
+                    MovingPieces[3].pos[0] -= 1
+                    MovingPieces[3].pos[1] += 1
+                if RotationState == 1:
+                    MovingPieces[0].pos[0] -= 1
+                    MovingPieces[0].pos[1] -= 1
+
+                    MovingPieces[1].pos[0] -= 1
+                    MovingPieces[1].pos[1] += 1
+                if RotationState == 2:
+                    MovingPieces[0].pos[0] += 1
+                    MovingPieces[0].pos[1] -= 1
+
+                    MovingPieces[1].pos[0] -= 1
+                    MovingPieces[1].pos[1] -= 1
+                if RotationState == 3:
+                    MovingPieces[2].pos[0] += 1
+                    MovingPieces[2].pos[1] -= 1
+
+                    MovingPieces[3].pos[0] += 1
+                    MovingPieces[3].pos[1] += 1
+            if ColorPiece == "Purple":
+                if RotationState == 0:
+                    MovingPieces[3].pos[0] -= 1
+
+                    MovingPieces[0].pos[0] -= 2
+                    MovingPieces[0].pos[1] += 1
+                if RotationState == 1:
+                    MovingPieces[2].pos[0] += 1
+                    MovingPieces[2].pos[1] -= 1
+
+                    MovingPieces[0].pos[0] += 2
+                    MovingPieces[0].pos[1] -= 2
+                if RotationState == 2:
+                    MovingPieces[0].pos[0] += 1
+
+                    MovingPieces[3].pos[0] += 2
+                    MovingPieces[3].pos[1] -= 1
+                if RotationState == 3:
+                    MovingPieces[2].pos[1] += 1
+
+                    MovingPieces[3].pos[0] += 1
+                    MovingPieces[3].pos[1] += 2
+            if ColorPiece == "Red":
+                if RotationState == 0:
+                    MovingPieces[0].pos[0] += 2
+
+                    MovingPieces[3].pos[1] += 2
+                if RotationState == 1:
+                    MovingPieces[3].pos[0] += 2
+
+                    MovingPieces[2].pos[1] += 2
+                if RotationState == 2:
+                    MovingPieces[2].pos[0] += 2
+
+                    MovingPieces[0].pos[1] -= 2
+                if RotationState == 3:
+                    MovingPieces[3].pos[0] += 2
+
+                    MovingPieces[0].pos[1] -= 2
+            if ColorPiece == "Green":
+                if RotationState == 0:
+                    MovingPieces[2].pos[0] += 2
+
+                    MovingPieces[3].pos[1] += 2
+                if RotationState == 1:
+                    MovingPieces[2].pos[0] -= 2
+
+                    MovingPieces[3].pos[1] += 2
+                if RotationState == 2:
+                    MovingPieces[1].pos[0] -= 2
+
+                    MovingPieces[0].pos[1] -= 2
+                if RotationState == 3:
+                    MovingPieces[1].pos[0] += 2
+
+                    MovingPieces[0].pos[1] -= 2
             for place in AllPieces:
                 for position in MovingPieces:
                     if position.pos == place.pos:
@@ -445,9 +691,11 @@ while True:
 
     if WeSpawn:
         RotationState = 0
-        num = random.randint(1, 7)
-        spawncords = []
-        dacolor = ""
+        if NextSpawn != 0:
+            num = NextSpawn
+        else:
+            num = random.randint(1, 7)
+        NextSpawn = random.randint(1, 7)
         if num == 1:
             spawncords = PieceCords("Square")
             dacolor = "Yellow"
@@ -475,6 +723,34 @@ while True:
                 if cords == thing.pos:
                     thing.state = dacolor
                     thing.ismoving = True
+
+    if NextSpawn == 1:
+        spawncords = PieceCords("Square")
+        dacolor = "Yellow"
+    elif NextSpawn == 2:
+        spawncords = PieceCords("L")
+        dacolor = "Orange"
+    elif NextSpawn == 3:
+        spawncords = PieceCords("LR")
+        dacolor = "Blue"
+    elif NextSpawn == 4:
+        spawncords = PieceCords("Line")
+        dacolor = "LightBlue"
+    elif NextSpawn == 5:
+        spawncords = PieceCords("T")
+        dacolor = "Purple"
+    elif NextSpawn == 6:
+        spawncords = PieceCords("Z")
+        dacolor = "Red"
+    elif NextSpawn == 7:
+        spawncords = PieceCords("ZR")
+        dacolor = "Green"
+
+    for thing in NextPieces:
+        thing.state = "Empty"
+        for cords in spawncords:
+            if cords == thing.pos:
+                thing.state = dacolor
 
     screen.blit(Background, (0, 0))
 
