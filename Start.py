@@ -332,48 +332,51 @@ def RotateCheck(allmoving):
         return False
 
 
-def PieceCords(name):
+def PieceCords(name, placement):
+    args = [0, 0]
+    if placement == "Middle":
+        args = [3, 1]
     if name == "Square":
-        squarepos = [[4, 0],
-                     [4, 1],
-                     [5, 0],
-                     [5, 1]]
+        squarepos = [[1 + args[0], 1 - args[1]],
+                     [1 + args[0], 2 - args[1]],
+                     [2 + args[0], 1 - args[1]],
+                     [2 + args[0], 2 - args[1]]]
         return squarepos
     if name == "L":
-        lpos = [[4, 0],
-                [4, 1],
-                [4, 2],
-                [5, 2]]
+        lpos = [[1 + args[0], 1 - args[1]],
+                [1 + args[0], 2 - args[1]],
+                [1 + args[0], 3 - args[1]],
+                [2 + args[0], 3 - args[1]]]
         return lpos
     if name == "LR":
-        lrpos = [[5, 0],
-                 [5, 1],
-                 [5, 2],
-                 [4, 2]]
+        lrpos = [[2 + args[0], 1 - args[1]],
+                 [2 + args[0], 2 - args[1]],
+                 [2 + args[0], 3 - args[1]],
+                 [1 + args[0], 3 - args[1]]]
         return lrpos
     if name == "Line":
-        linepos = [[5, 0],
-                   [5, 1],
-                   [5, 2],
-                   [5, 3]]
+        linepos = [[2 + args[0], 0],
+                   [2 + args[0], 1],
+                   [2 + args[0], 2],
+                   [2 + args[0], 3]]
         return linepos
     if name == "T":
-        tpos = [[5, 0],
-                [5, 1],
-                [4, 1],
-                [6, 1]]
+        tpos = [[2 + args[0], 1 - args[1]],
+                [2 + args[0], 2 - args[1]],
+                [1 + args[0], 2 - args[1]],
+                [3 + args[0], 2 - args[1]]]
         return tpos
     if name == "Z":
-        zpos = [[5, 0],
-                [5, 1],
-                [4, 1],
-                [4, 2]]
+        zpos = [[2 + args[0], 1 - args[1]],
+                [2 + args[0], 2 - args[1]],
+                [1 + args[0], 2 - args[1]],
+                [1 + args[0], 3 - args[1]]]
         return zpos
     if name == "ZR":
-        zrpos = [[4, 0],
-                 [4, 1],
-                 [5, 1],
-                 [5, 2]]
+        zrpos = [[1 + args[0], 1 - args[1]],
+                 [1 + args[0], 2 - args[1]],
+                 [2 + args[0], 2 - args[1]],
+                 [2 + args[0], 3 - args[1]]]
         return zrpos
 
 
@@ -697,25 +700,25 @@ while True:
             num = random.randint(1, 7)
         NextSpawn = random.randint(1, 7)
         if num == 1:
-            spawncords = PieceCords("Square")
+            spawncords = PieceCords("Square", "Middle")
             dacolor = "Yellow"
         elif num == 2:
-            spawncords = PieceCords("L")
+            spawncords = PieceCords("L", "Middle")
             dacolor = "Orange"
         elif num == 3:
-            spawncords = PieceCords("LR")
+            spawncords = PieceCords("LR", "Middle")
             dacolor = "Blue"
         elif num == 4:
-            spawncords = PieceCords("Line")
+            spawncords = PieceCords("Line", "Middle")
             dacolor = "LightBlue"
         elif num == 5:
-            spawncords = PieceCords("T")
+            spawncords = PieceCords("T", "Middle")
             dacolor = "Purple"
         elif num == 6:
-            spawncords = PieceCords("Z")
+            spawncords = PieceCords("Z", "Middle")
             dacolor = "Red"
         elif num == 7:
-            spawncords = PieceCords("ZR")
+            spawncords = PieceCords("ZR", "Middle")
             dacolor = "Green"
 
         for cords in spawncords:
@@ -725,25 +728,25 @@ while True:
                     thing.ismoving = True
 
     if NextSpawn == 1:
-        spawncords = PieceCords("Square")
+        spawncords = PieceCords("Square", "Side")
         dacolor = "Yellow"
     elif NextSpawn == 2:
-        spawncords = PieceCords("L")
+        spawncords = PieceCords("L", "Side")
         dacolor = "Orange"
     elif NextSpawn == 3:
-        spawncords = PieceCords("LR")
+        spawncords = PieceCords("LR", "Side")
         dacolor = "Blue"
     elif NextSpawn == 4:
-        spawncords = PieceCords("Line")
+        spawncords = PieceCords("Line", "Side")
         dacolor = "LightBlue"
     elif NextSpawn == 5:
-        spawncords = PieceCords("T")
+        spawncords = PieceCords("T", "Side")
         dacolor = "Purple"
     elif NextSpawn == 6:
-        spawncords = PieceCords("Z")
+        spawncords = PieceCords("Z", "Side")
         dacolor = "Red"
     elif NextSpawn == 7:
-        spawncords = PieceCords("ZR")
+        spawncords = PieceCords("ZR", "Side")
         dacolor = "Green"
 
     for thing in NextPieces:
