@@ -258,11 +258,10 @@ def RotateCheck(allmoving):
             themoving[0].pos[0] -= 2
             themoving[0].pos[1] += 1
         if RotationState == 1:
-            themoving[2].pos[0] += 1
-            themoving[2].pos[1] -= 1
-
-            themoving[0].pos[0] += 2
+            themoving[0].pos[0] -= 1
             themoving[0].pos[1] -= 2
+
+            themoving[1].pos[1] -= 1
         if RotationState == 2:
             themoving[0].pos[0] += 1
 
@@ -380,6 +379,31 @@ def PieceCords(name, placement):
         return zrpos
 
 
+def RandomPieceCheck(danum, dacords, spawncolor, placement):
+    if 1 <= danum <= 20:
+        dacords = PieceCords("Square", placement)
+        spawncolor = "Yellow"
+    elif 21 <= danum <= 35:
+        dacords = PieceCords("L", placement)
+        spawncolor = "Orange"
+    elif 36 <= danum <= 50:
+        dacords = PieceCords("LR", placement)
+        spawncolor = "Blue"
+    elif 51 <= danum <= 70:
+        dacords = PieceCords("Line", placement)
+        spawncolor = "LightBlue"
+    elif 71 <= danum <= 80:
+        dacords = PieceCords("T", placement)
+        spawncolor = "Purple"
+    elif 81 <= danum <= 90:
+        dacords = PieceCords("Z", placement)
+        spawncolor = "Red"
+    elif 91 <= danum <= 100:
+        dacords = PieceCords("ZR", placement)
+        spawncolor = "Green"
+    return dacords, spawncolor
+
+
 Background = pygame.image.load("Assets/Bg.png").convert()
 BlueBlock = pygame.image.load("Assets/BlueBlock.png").convert()
 GreenBlock = pygame.image.load("Assets/GreenBlock.png").convert()
@@ -415,6 +439,8 @@ num = 0
 spawncords = []
 dacolor = ""
 
+OriginPos = [3, 0]
+
 Lost = False
 
 while True:
@@ -434,7 +460,8 @@ while True:
             if event.key == pygame.K_SPACE:
                 Rotating = True
             if event.key == pygame.K_LSHIFT:
-                HoldSpawn = num
+                if HoldSpawn != 0:
+                    HoldSpawn = num
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_d:
                 if Direction == "Right":
@@ -553,11 +580,10 @@ while True:
                     MovingPieces[0].pos[0] -= 2
                     MovingPieces[0].pos[1] += 1
                 if RotationState == 1:
-                    MovingPieces[2].pos[0] += 1
-                    MovingPieces[2].pos[1] -= 1
-
-                    MovingPieces[0].pos[0] += 2
+                    MovingPieces[0].pos[0] -= 1
                     MovingPieces[0].pos[1] -= 2
+
+                    MovingPieces[1].pos[1] -= 1
                 if RotationState == 2:
                     MovingPieces[0].pos[0] += 1
 
@@ -574,11 +600,11 @@ while True:
 
                     MovingPieces[3].pos[1] += 2
                 if RotationState == 1:
-                    MovingPieces[3].pos[0] += 2
+                    MovingPieces[0].pos[0] -= 2
 
-                    MovingPieces[2].pos[1] += 2
+                    MovingPieces[3].pos[1] += 2
                 if RotationState == 2:
-                    MovingPieces[2].pos[0] += 2
+                    MovingPieces[3].pos[0] -= 2
 
                     MovingPieces[0].pos[1] -= 2
                 if RotationState == 3:
@@ -642,6 +668,10 @@ while True:
                             if movingB.pos[0] == mover.pos[0] - 1:
                                 movingB.state = mover.state
                                 movingB.ismoving = True
+            if Direction == "Right":
+                OriginPos[0] += 1
+            elif Direction == "Left":
+                OriginPos[0] -= 1
         MovingPieces = []
         MoveTimer = 0
         Blocked = False
@@ -662,6 +692,7 @@ while True:
                         if movingB.pos[1] == mover.pos[1] + 1:
                             movingB.state = mover.state
                             movingB.ismoving = True
+            OriginPos[1] += 1
         else:
             for movingB in AllPieces:
                 if movingB.ismoving:
@@ -700,33 +731,14 @@ while True:
             WeSpawn = False
 
     if WeSpawn:
+        OriginPos = [3, 0]
         RotationState = 0
         if NextSpawn != 0:
             num = NextSpawn
         else:
-            num = random.randint(1, 7)
-        NextSpawn = random.randint(1, 7)
-        if num == 1:
-            spawncords = PieceCords("Square", "Middle")
-            dacolor = "Yellow"
-        elif num == 2:
-            spawncords = PieceCords("L", "Middle")
-            dacolor = "Orange"
-        elif num == 3:
-            spawncords = PieceCords("LR", "Middle")
-            dacolor = "Blue"
-        elif num == 4:
-            spawncords = PieceCords("Line", "Middle")
-            dacolor = "LightBlue"
-        elif num == 5:
-            spawncords = PieceCords("T", "Middle")
-            dacolor = "Purple"
-        elif num == 6:
-            spawncords = PieceCords("Z", "Middle")
-            dacolor = "Red"
-        elif num == 7:
-            spawncords = PieceCords("ZR", "Middle")
-            dacolor = "Green"
+            num = random.randint(1, 100)
+        NextSpawn = random.randint(1, 100)
+        spawncords, dacolor = RandomPieceCheck(num, spawncords, dacolor, "Middle")
 
         for cords in spawncords:
             for thing in AllPieces:
@@ -734,27 +746,10 @@ while True:
                     thing.state = dacolor
                     thing.ismoving = True
 
-    if NextSpawn == 1:
-        spawncords = PieceCords("Square", "Side")
-        dacolor = "Yellow"
-    elif NextSpawn == 2:
-        spawncords = PieceCords("L", "Side")
-        dacolor = "Orange"
-    elif NextSpawn == 3:
-        spawncords = PieceCords("LR", "Side")
-        dacolor = "Blue"
-    elif NextSpawn == 4:
-        spawncords = PieceCords("Line", "Side")
-        dacolor = "LightBlue"
-    elif NextSpawn == 5:
-        spawncords = PieceCords("T", "Side")
-        dacolor = "Purple"
-    elif NextSpawn == 6:
-        spawncords = PieceCords("Z", "Side")
-        dacolor = "Red"
-    elif NextSpawn == 7:
-        spawncords = PieceCords("ZR", "Side")
-        dacolor = "Green"
+        if dacolor == "Purple":
+            OriginPos[1] -= 1
+
+    spawncords, dacolor = RandomPieceCheck(NextSpawn, spawncords, dacolor, "Next")
 
     for thing in NextPieces:
         thing.state = "Empty"
@@ -765,40 +760,28 @@ while True:
     spawncords = []
     dacolor = "Empty"
 
-    if HoldSpawn == 1:
-        spawncords = PieceCords("Square", "Side")
-        dacolor = "Yellow"
-    elif HoldSpawn == 2:
-        spawncords = PieceCords("L", "Side")
-        dacolor = "Orange"
-    elif HoldSpawn == 3:
-        spawncords = PieceCords("LR", "Side")
-        dacolor = "Blue"
-    elif HoldSpawn == 4:
-        spawncords = PieceCords("Line", "Side")
-        dacolor = "LightBlue"
-    elif HoldSpawn == 5:
-        spawncords = PieceCords("T", "Side")
-        dacolor = "Purple"
-    elif HoldSpawn == 6:
-        spawncords = PieceCords("Z", "Side")
-        dacolor = "Red"
-    elif HoldSpawn == 7:
-        spawncords = PieceCords("ZR", "Side")
-        dacolor = "Green"
-
     for thing in HoldingPieces:
         thing.state = "Empty"
-        for cords in spawncords:
-            if cords == thing.pos:
-                thing.state = dacolor
 
+    for thing in HoldingPieces:
+        if -1 != (OriginPos[0] + thing.pos[0]):
+            if -2 != (OriginPos[0] + thing.pos[0]):
+                if 10 != (OriginPos[0] + thing.pos[0]):
+                    if 11 != (OriginPos[0] + thing.pos[0]):
+                        for some in AllPieces:
+                            if some.ismoving:
+                                if some.pos[0] == (OriginPos[0] + thing.pos[0]):
+                                    if some.pos[1] == (OriginPos[1] + thing.pos[1]):
+                                        thing.state = some.state
+
+    # Lose Check
     for thing in AllPieces:
         if thing.pos[1] == 3:
             if not thing.ismoving:
                 if thing.state != "Empty":
                     Lost = True
 
+    # Lose
     if Lost:
         for thing in AllPieces:
             thing.state = "Empty"

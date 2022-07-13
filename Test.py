@@ -25,7 +25,7 @@ screen = pygame.display.set_mode((500, 500))
 pygame.display.set_caption("Default")
 clock = pygame.time.Clock()
 
-m = [[0, 0], [0, 1]]
+m = [73, 54, 90]
 
 thing(m)
 
@@ -37,5 +37,6 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+
     pygame.display.update()
     clock.tick(60)
