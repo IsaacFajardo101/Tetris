@@ -51,6 +51,8 @@ def UpdateColorNodes(NodeList, Where):
                 screen.blit(RedBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
             if node.state == "Yellow":
                 screen.blit(YellowBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
+            if node.state == "Gray":
+                screen.blit(GrayBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
             if node.state == "Empty":
                 screen.blit(EmptyBlock, (125 + (node.pos[0] * 25), 0 + (node.pos[1] * 25)))
     if Where == "Hold":
@@ -69,6 +71,8 @@ def UpdateColorNodes(NodeList, Where):
                 screen.blit(RedBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
             if node.state == "Yellow":
                 screen.blit(YellowBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
+            if node.state == "Gray":
+                screen.blit(GrayBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
             if node.state == "Empty":
                 screen.blit(EmptyBlock, (12 + (node.pos[0] * 25), 12 + (node.pos[1] * 25)))
     if Where == "Next":
@@ -87,6 +91,8 @@ def UpdateColorNodes(NodeList, Where):
                 screen.blit(RedBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
             if node.state == "Yellow":
                 screen.blit(YellowBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
+            if node.state == "Gray":
+                screen.blit(GrayBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
             if node.state == "Empty":
                 screen.blit(EmptyBlock, (389 + (node.pos[0] * 25), 11 + (node.pos[1] * 25)))
 
@@ -404,6 +410,22 @@ def RandomPieceCheck(danum, dacords, spawncolor, placement):
     return dacords, spawncolor
 
 
+def HoldUpdate():
+    for thinging in HoldingPieces:
+        thinging.state = "Empty"
+
+    for thinging in HoldingPieces:
+        if -1 != (OriginPos[0] + thinging.pos[0]):
+            if -2 != (OriginPos[0] + thinging.pos[0]):
+                if 10 != (OriginPos[0] + thinging.pos[0]):
+                    if 11 != (OriginPos[0] + thinging.pos[0]):
+                        for some in AllPieces:
+                            if some.ismoving:
+                                if some.pos[0] == (OriginPos[0] + thinging.pos[0]):
+                                    if some.pos[1] == (OriginPos[1] + thinging.pos[1]):
+                                        thinging.state = some.state
+
+
 Background = pygame.image.load("Assets/Bg.png").convert()
 BlueBlock = pygame.image.load("Assets/BlueBlock.png").convert()
 GreenBlock = pygame.image.load("Assets/GreenBlock.png").convert()
@@ -412,6 +434,7 @@ OrangeBlock = pygame.image.load("Assets/OrangeBlock.png").convert()
 PurpleBlock = pygame.image.load("Assets/PurpleBlock.png").convert()
 RedBlock = pygame.image.load("Assets/RedBlock.png").convert()
 YellowBlock = pygame.image.load("Assets/YellowBlock.png").convert()
+GrayBlock = pygame.image.load("Assets/GrayBlock.png").convert()
 EmptyBlock = pygame.Surface((25, 25))
 EmptyBlock.set_alpha(0)
 
@@ -441,7 +464,16 @@ dacolor = ""
 
 OriginPos = [3, 0]
 
+HoldState = ""
+isHolding = False
+swapping = False
+HoldLocked = False
+HoldRotate = 0
+VarRotate = 0
+
 Lost = False
+
+varHolding = []
 
 while True:
     for event in pygame.event.get():
@@ -456,12 +488,38 @@ while True:
                 moving = True
                 Direction = "Left"
             if event.key == pygame.K_s:
-                speed = 5
+                speed = 3
             if event.key == pygame.K_SPACE:
                 Rotating = True
             if event.key == pygame.K_LSHIFT:
-                if HoldSpawn != 0:
-                    HoldSpawn = num
+                if not HoldLocked:
+                    VarRotate = HoldRotate
+                    HoldRotate = RotationState
+                    varHolding = copy.deepcopy(HoldingPieces)
+                    HoldUpdate()
+                    for thing in AllPieces:
+                        if thing.ismoving:
+                            HoldState = thing.state
+                            thing.state = "Empty"
+                            thing.ismoving = False
+                    if isHolding:
+                        OriginPos = [3, 0]
+                        for thing in AllPieces:
+                            for thinging in varHolding:
+                                if (thinging.pos[0] + 3) == thing.pos[0]:
+                                    if thinging.pos[1] == thing.pos[1]:
+                                        thing.state = thinging.state
+                                        if thinging.state != "Empty":
+                                            thing.ismoving = True
+                        RotationState = VarRotate
+                    else:
+                        HoldSpawn = num
+                        isHolding = True
+                    for thing in HoldingPieces:
+                        if thing.state != "Empty":
+                            HoldState = thing.state
+                            thing.state = "Gray"
+                    HoldLocked = True
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_d:
                 if Direction == "Right":
@@ -697,7 +755,12 @@ while True:
             for movingB in AllPieces:
                 if movingB.ismoving:
                     movingB.ismoving = False
+            for thing in HoldingPieces:
+                if thing.state != "Empty":
+                    thing.state = HoldState
+            HoldLocked = False
             speed = 30
+
         MovingPieces = []
         TickTimer = 0
 
@@ -725,11 +788,13 @@ while True:
                         stuff.state = thing.state
         MovingPieces = []
 
+#   spawn check
     WeSpawn = True
     for thing in AllPieces:
         if thing.ismoving:
             WeSpawn = False
 
+#   spawn
     if WeSpawn:
         OriginPos = [3, 0]
         RotationState = 0
@@ -739,6 +804,12 @@ while True:
             num = random.randint(1, 100)
         NextSpawn = random.randint(1, 100)
         spawncords, dacolor = RandomPieceCheck(num, spawncords, dacolor, "Middle")
+        spawnvar, varcolor = RandomPieceCheck(NextSpawn, spawncords, dacolor, "Middle")
+
+        if varcolor == dacolor:
+            NextSpawn += 30
+            if NextSpawn > 100:
+                NextSpawn = 100
 
         for cords in spawncords:
             for thing in AllPieces:
@@ -747,6 +818,8 @@ while True:
                     thing.ismoving = True
 
         if dacolor == "Purple":
+            OriginPos[1] -= 1
+        if dacolor == "Yellow":
             OriginPos[1] -= 1
 
     spawncords, dacolor = RandomPieceCheck(NextSpawn, spawncords, dacolor, "Next")
@@ -760,28 +833,14 @@ while True:
     spawncords = []
     dacolor = "Empty"
 
-    for thing in HoldingPieces:
-        thing.state = "Empty"
-
-    for thing in HoldingPieces:
-        if -1 != (OriginPos[0] + thing.pos[0]):
-            if -2 != (OriginPos[0] + thing.pos[0]):
-                if 10 != (OriginPos[0] + thing.pos[0]):
-                    if 11 != (OriginPos[0] + thing.pos[0]):
-                        for some in AllPieces:
-                            if some.ismoving:
-                                if some.pos[0] == (OriginPos[0] + thing.pos[0]):
-                                    if some.pos[1] == (OriginPos[1] + thing.pos[1]):
-                                        thing.state = some.state
-
-    # Lose Check
+#   Lose Check
     for thing in AllPieces:
         if thing.pos[1] == 3:
             if not thing.ismoving:
                 if thing.state != "Empty":
                     Lost = True
 
-    # Lose
+#   Lose
     if Lost:
         for thing in AllPieces:
             thing.state = "Empty"
